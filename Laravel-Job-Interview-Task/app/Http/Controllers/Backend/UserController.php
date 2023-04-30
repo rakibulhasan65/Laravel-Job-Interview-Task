@@ -8,6 +8,8 @@ use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
 use Hash;
 use Str;
+use Illuminate\Support\Facades\Auth;
+use Session;
 
 class UserController extends Controller
 {
@@ -16,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $usersData = User::latest()->paginate(3);
+        $usersData = User::latest()->paginate(8);
         return view('backend.page.user', compact('usersData'));
     }
 
@@ -45,7 +47,12 @@ class UserController extends Controller
         $userDataStore->password = Hash::make('password');
         $userDataStore->remember_token = Str::random(60);
         $userDataStore->save();
-        return redirect()->route('admin')->with('success', 'Your Registration Has Ben Success!');
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            return redirect()->intended('admin')
+                ->withSuccess('You have Successfully Register');
+        }
+        return redirect('register')->withErrors('Register Error!');
     }
 
     /**
@@ -77,6 +84,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $userDelete = User::find($id);
+        $userDelete->delete();
+        return redirect()->back();
     }
 }

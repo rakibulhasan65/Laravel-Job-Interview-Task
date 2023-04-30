@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Session;
 
 class AuthenticationController extends Controller
 {
@@ -19,13 +20,21 @@ class AuthenticationController extends Controller
 
     public function userLogin(Request $request)
     {
-        $checkUser = $request->only('email', 'password');
-        if (Auth::attempt($checkUser)) {
-            return redirect()->intended('admin');
-            // return response()->json($checkUser);
-        } else {
-            return redirect()->route('login');
-            // return response()->json($checkUser);
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            return redirect()->intended('admin')
+                ->withSuccess('You have Successfully Login');
         }
+        return redirect()->Route('login');
+    }
+    public function logout()
+    {
+        Session::flush();
+        Auth::logout();
+        return redirect()->Route('index');
     }
 }

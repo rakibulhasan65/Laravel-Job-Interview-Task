@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticationController;
+use App\Http\Controllers\Backend\DashboardController;
+use App\Http\Controllers\Backend\UserController;
+use App\Http\Controllers\Frontend\WebsiteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +17,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [WebsiteController::class, 'index'])->name('index');
+Route::get('/login', [AuthenticationController::class, 'login'])->name('login');
+Route::post('/userLogin', [AuthenticationController::class, 'userLogin'])->name('userLogin');
+Route::get('/register', [AuthenticationController::class, 'register'])->name('register');
+Route::get('/logout', [AuthenticationController::class, 'logout'])->name('logout');
+Route::resource('users', UserController::class);
+Route::get('/admin', [DashboardController::class, 'admin'])->name('admin');
